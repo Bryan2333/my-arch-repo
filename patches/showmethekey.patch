@@ -1,0 +1,13 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index fe6f14e..a02706a 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -5,7 +5,7 @@ pkgrel=1
+ pkgdesc="A screenkey alternative that works under Wayland via libinput."
+ arch=("x86_64" "i686" "aarch64" "armv7h" "armv6h")
+ url="https://showmethekey.alynx.one/"
+-license=("Apache")
++license=("Apache-2.0")
+ depends=("libevdev" "udev" "libinput" "glib2" "gtk4" "libadwaita" "json-glib" "cairo" "pango" "libxkbcommon" "polkit")
+ makedepends=("meson" "glib2-devel")
+ source=("https://github.com/AlynxZhou/${pkgname}/archive/v${pkgver}.tar.gz")

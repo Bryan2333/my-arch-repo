@@ -1,0 +1,13 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 2f9bbab..9e3f0f7 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -6,7 +6,7 @@ epoch=
+ pkgdesc="A bittorrent client powered by C++, Qt and the good libtorrent library (Enhanced Edition)"
+ arch=('x86_64')
+ url="https://github.com/c0re100/qBittorrent-Enhanced-Edition"
+-license=('GPL' 'custom')
++license=('GPL-2.0-or-later AND GPL-3.0-or-later AND custom')
+ groups=()
+ depends=('gcc-libs' 'glibc' 'libtorrent-rasterbar' 'openssl' 'qt6-base' 'qt6-svg' 'hicolor-icon-theme' 'zlib')
+ makedepends=('cmake' 'boost>=1.65' 'qt6-tools')

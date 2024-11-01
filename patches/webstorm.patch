@@ -1,0 +1,23 @@
+diff --git a/PKGBUILD b/PKGBUILD
+old mode 100755
+new mode 100644
+index 70f67f0..a998cef
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -28,14 +28,14 @@ package_webstorm() {
+   install -dm755 "${pkgdir}"/opt/
+   install -dm755 "${pkgdir}"/usr/bin/
+   install -dm755 "${pkgdir}"/usr/share/applications/
+-  install -dm755 "${pkgdir}"/usr/share/pixmaps/
++  install -dm755 "${pkgdir}"/usr/share/icons/hicolor/scalable/apps/
+ 
+   cp -a WebStorm-${_buildver:?_buildver unset}/ "${pkgdir}"/opt/${pkgbase}
+   rm -rf "${pkgdir}"/opt/${pkgbase}/jbr
+ 
+   ln -s /opt/${pkgbase}/bin/${pkgbase} "${pkgdir}"/usr/bin/${pkgbase}
+   install -m644 "${srcdir}"/jetbrains-${pkgbase}.desktop "${pkgdir}"/usr/share/applications/
+-  install -m644 "${pkgdir}"/opt/${pkgbase}/bin/${pkgbase}.svg "${pkgdir}"/usr/share/pixmaps/${pkgbase}.svg
++  ln -s /opt/${pkgbase}/bin/${pkgbase}.svg "${pkgdir}"/usr/share/icons/hicolor/scalable/apps/${pkgbase}.svg
+   install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE.txt
+ }
+ 

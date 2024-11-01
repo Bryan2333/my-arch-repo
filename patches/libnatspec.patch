@@ -1,0 +1,13 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index f8489c7..35cb21f 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -9,7 +9,7 @@ pkgrel=1
+ pkgdesc="A collection of functions for request various charsets and locales for host system and for other system."
+ arch=('i686' 'x86_64' 'armv7h' 'armv6h')
+ url="https://github.com/Etersoft/libnatspec"
+-license=('LGPL')
++license=('LGPL-2.1-only')
+ makedepends=('popt')
+ optdepends=('popt: natspec tool')
+ source=(

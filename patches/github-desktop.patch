@@ -1,0 +1,53 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 691670d..12a3aac 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -38,6 +38,9 @@ sha256sums=('e91af0fb0b02c4fa0778228e29cd9a859707dd6b772c4524cc82cdbf96bf0763'
+             'SKIP'
+             '932e4c456e8c6db03d27172cf0daa37806bf025bb560d8b3d758c0997d1a618c')
+ 
++source+=("launch-github-desktop")
++sha256sums+=("03622e056540df8374eff814ca4127be40bbcb1d5430e400af6a34246d0ac986")
++
+ prepare() {
+ 	cd "$pkgname"
+ 	git submodule init
+@@ -66,6 +69,8 @@ package() {
+ 	install -Dm0644 "1024x1024.png" "$pkgdir/usr/share/icons/hicolor/1024x1024/apps/$pkgname.png"
+ 	install -Dm0644 "512x512.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/$pkgname.png"
+ 	install -Dm0644 "256x256.png" "$pkgdir/usr/share/icons/hicolor/256x256/apps/$pkgname.png"
+-	printf "#!/bin/sh\n\n/opt/$pkgname/github-desktop \"\$@\"\n" |
+-		install -Dm0755 /dev/stdin "$pkgdir/usr/bin/$pkgname"
++	install -Dm0644 "128x128.png" "$pkgdir/usr/share/icons/hicolor/128x128/apps/$pkgname.png"
++	install -Dm0644 "64x64.png" "$pkgdir/usr/share/icons/hicolor/64x64/apps/$pkgname.png"
++	install -Dm0644 "32x32.png" "$pkgdir/usr/share/icons/hicolor/32x32/apps/$pkgname.png"
++	install -Dm0755 "$srcdir/launch-github-desktop" "$pkgdir/usr/bin/${pkgname}"
+ }
+diff --git a/launch-github-desktop b/launch-github-desktop
+new file mode 100755
+index 0000000..6f8eb5f
+--- /dev/null
++++ b/launch-github-desktop
+@@ -0,0 +1,22 @@
++#!/bin/bash
++
++set -euo pipefail
++
++flags_file="${XDG_CONFIG_HOME:-$HOME/.config}/github-desktop-flags.conf"
++
++declare -a desktop_flags
++
++if [[ -f "${flags_file}" ]]
++then
++    mapfile -t < "${flags_file}" DESKTOP_MAP_FILE
++fi
++
++for line in "${DESKTOP_MAP_FILE[@]}"
++do
++    if [[ ! "${line}" =~ ^[[:space:]]*#.* ]]
++    then
++        desktop_flags+=("${line}")
++    fi
++done
++
++exec /opt/github-desktop/github-desktop "${desktop_flags[@]}" "$@"

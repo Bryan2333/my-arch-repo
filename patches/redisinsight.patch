@@ -1,0 +1,59 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 6d6a693..254db4a 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -5,7 +5,7 @@ pkgrel=2
+ pkgdesc="Desktop manager that provides an intuitive and efficient GUI for Redis, allowing you to interact with your databases, monitor, and manage your data."
+ arch=('x86_64')
+ url='https://redis.com/redis-enterprise/redis-insight'
+-license=('custom:SSPL')
++license=('SSPL-1.0')
+ depends=()
+ provides=(redis-insight)
+ conflicts=(redis-insight-bin)
+@@ -23,6 +23,9 @@ clang
+ source=("$pkgname-$pkgver.tar.gz::https://github.com/RedisInsight/RedisInsight/archive/$pkgver.tar.gz")
+ sha256sums=('2814818d890f3622b49d629527f6b5dfd8a7be944f75f74562778f04b5d33c38')
+ 
++source+=("launch-redisinsight")
++sha256sums+=("2440c762fbfeadb4536a51b28de07159cac042aad42148be76a3134709675648")
++
+ _ensure_local_nvm() {
+     # let's be sure we are starting clean
+     which nvm >/dev/null 2>&1 && nvm deactivate && nvm unload
+@@ -77,6 +80,6 @@ package() {
+   install -d "${pkgdir}/opt"
+   install -d "${pkgdir}/opt/${pkgname}"
+   cp -avR * "${pkgdir}/opt/${pkgname}"
+-  ln -s /opt/${pkgname}/redisinsight "${pkgdir}/usr/bin/redisinsight"
++  install -Dm755 "${srcdir}/launch-redisinsight" "${pkgdir}/usr/bin/redisinsight"
+   find "${pkgdir}/opt/${pkgname}" -type d -exec chmod 755 {} +
+ }
+diff --git a/launch-redisinsight b/launch-redisinsight
+new file mode 100644
+index 0000000..c946c54
+--- /dev/null
++++ b/launch-redisinsight
+@@ -0,0 +1,22 @@
++#!/usr/bin/env bash
++
++set -euo pipefail
++
++flags_file="${XDG_CONFIG_HOME:-$HOME/.config}/redisinsight-flags.conf"
++
++declare -a redisinsight_flags
++
++if [[ -f "${flags_file}" ]]
++then
++    mapfile -t < "${flags_file}" REDISINSIGHT_MAP_FILE
++fi
++
++for line in "${REDISINSIGHT_MAP_FILE[@]}"
++do
++    if [[ ! "${line}" =~ ^[[:space:]]*#.* ]]
++    then
++        redisinsight_flags+=("${line}")
++    fi
++done
++
++exec /opt/redisinsight/redisinsight "${redisinsight_flags[@]}" "$@"

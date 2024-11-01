@@ -1,0 +1,81 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index e7c8cef..c81c131 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -25,6 +25,8 @@ source_x86_64=("${_Pkgname}-${pkgver}-x86_64.AppImage::${_image_url_x86_64}")
+ source_aarch64=("${_Pkgname}-${pkgver}-aarch64.AppImage::${_image_url_aarch64}")
+ sha256sums_x86_64=('035bb4cecf4aea5c733ad29f4c8637573979c03d2c59e10add7db901c403a30b')
+ sha256sums_aarch64=('e033464e87efbf713b91d584a11c69b145aa6fcd854418d79cf1983683f6d9fd')
++source=("launch-linuxqq")
++sha256sums=("9700786cf92e8b123ed855130665e0764f0221df6f84de437cb24c7e534d266d")
+ 
+ _appimage="${_Pkgname}-${pkgver}-${CARCH}.AppImage"
+ noextract=("${_appimage}")
+@@ -37,8 +39,8 @@ prepare() {
+ build() {
+     # Adjust .desktop so it will work outside of AppImage container
+     sed -i \
+-        -e "s|Exec=AppRun|Exec=env DESKTOPINTEGRATION=false /usr/bin/${_pkgname}|" \
+-        -e "s|Icon=.*|Icon=/usr/share/icons/${_pkgname}.png|" \
++        -e "s|Exec=.*|Exec=env DESKTOPINTEGRATION=false /usr/bin/${_pkgname}|" \
++        -e "s|Icon=.*|Icon=qq|" \
+         "squashfs-root/${_disname}.desktop"
+ 
+     # Fix permissions; .AppImage permissions are 700 for all directories
+@@ -47,24 +49,18 @@ build() {
+ 
+ package() {
+     # AppImage
+-    install -Dm755 "${srcdir}/${_appimage}" "${pkgdir}/opt/${pkgname}/${pkgname}.AppImage"
+-    install -Dm644 "${srcdir}/squashfs-root/LICENSE.electron.txt" "${pkgdir}/opt/${pkgname}/LICENSE"
++    install -Dm755 "${srcdir}/${_appimage}" "${pkgdir}/opt/${pkgname}/${_pkgname}.AppImage"
+ 
+     # Desktop file
+     install -Dm644 "${srcdir}/squashfs-root/${_disname}.desktop"\
+             "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+ 
+     # Icon images
+-    install -dm755 "${pkgdir}/usr/share/"
+-    cp -a "${srcdir}/squashfs-root/usr/share/icons" "${pkgdir}/usr/share/"
+-    ln -s "$(realpath ${srcdir}/squashfs-root/${_disname}.png  --relative-to ${srcdir}/squashfs-root/usr/share/icons)"\
+-        "${pkgdir}/usr/share/icons/${_pkgname}.png"
++    install -Dm644 "${srcdir}/squashfs-root/usr/share/icons/hicolor/512x512/apps/qq.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/qq.png"
+ 
+     # Symlink executable
+-    install -dm755 "${pkgdir}/usr/bin"
+-    ln -s "/opt/${pkgname}/${pkgname}.AppImage" "${pkgdir}/usr/bin/${_pkgname}"
++    install -Dm755 "${srcdir}/launch-linuxqq" "${pkgdir}/usr/bin/${_pkgname}"
+ 
+     # Symlink license
+-    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}/"
+-    ln -s "/opt/$pkgname/LICENSE" "$pkgdir/usr/share/licenses/$pkgname"
++    install -Dm644 "${srcdir}/squashfs-root/LICENSE.electron.txt" "${pkgdir}/usr/share/licenses/${_pkgname}/LICENSE"
+ }
+diff --git a/launch-linuxqq b/launch-linuxqq
+new file mode 100755
+index 0000000..d64a93d
+--- /dev/null
++++ b/launch-linuxqq
+@@ -0,0 +1,22 @@
++#!/bin/bash
++
++set -euo pipefail
++
++flags_file="${XDG_CONFIG_HOME:-$HOME/.config}/linuxqq-flags.conf"
++
++declare -a linuxqq_flags
++
++if [[ -f "${flags_file}" ]]
++then
++    mapfile -t < "${flags_file}" LINUXQQ_USER_FLAGS
++fi
++
++for line in "${LINUXQQ_USER_FLAGS[@]}"
++do
++    if [[ ! "${line}" =~ ^[[:space:]]*#.* ]]
++    then
++        linuxqq_flags+=("${line}")
++    fi
++done
++
++exec /opt/linuxqq-appimage/linuxqq.AppImage "${linuxqq_flags[@]}" "$@"

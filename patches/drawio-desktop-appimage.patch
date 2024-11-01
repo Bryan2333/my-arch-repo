@@ -1,0 +1,63 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index f27ddc8..16654b8 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -7,7 +7,7 @@ pkgdesc="Diagram drawing application built on web technology"
+ arch=('x86_64' 'aarch64')
+ url="https://www.diagrams.net/"
+ _githuburl="https://github.com/jgraph/drawio-desktop"
+-license=('Apache2')
++license=('Apache-2.0')
+ options=(!strip)
+ conflicts=(drawio-desktop)
+ depends=('zlib' 'hicolor-icon-theme' 'glibc' 'fuse2')
+@@ -16,16 +16,19 @@ source_x86_64=("${_pkgname}-${pkgver}.AppImage::${_githuburl}/releases/download/
+ sha1sums_x86_64=('d844203becbecc9fa8e9fc590565b10bebd66cec')
+ source_aarch64=("${_pkgname}-${pkgver}.AppImage::${_githuburl}/releases/download/v${pkgver}/${_pkgname}-arm64-${pkgver}.AppImage")
+ sha1sums_aarch64=('5f9d5f5a83461427ea80e22ccf54641c33b2d7aa')
++source=("./launch-drawio")
++sha1sums=("a401a28fbf7ef8d6053b66c06179d1e19ec430d1")
+ prepare() {
+     chmod a+x "${_pkgname}-${pkgver}.AppImage"
+     "./${_pkgname}-${pkgver}.AppImage" --appimage-extract
+-    sed 's/Exec=/\#Exec=/g' -i "${srcdir}/squashfs-root/${_pkgname}.desktop"
+-    echo "Exec=${_install_path}/${_pkgname}.AppImage --no-sandbox %U" >> "${srcdir}/squashfs-root/${_pkgname}.desktop"
++    sed 's|^Exec=.*|Exec=/usr/bin/drawio %U|' -i "${srcdir}/squashfs-root/${_pkgname}.desktop"
+ }
+ package() {
+     install -Dm755 "${srcdir}/${_pkgname}-${pkgver}.AppImage" "${pkgdir}/${_install_path}/${_pkgname}.AppImage"
++    install -Dm755 "${srcdir}/launch-drawio" "${pkgdir}/usr/bin/drawio"
+     for icons in 16x16 32x32 48x48 64x64 96x96 128x128 192x192 256x256 512x512 720x720 1024x1024;do
+         install -Dm644 "${srcdir}/squashfs-root/usr/share/icons/hicolor/${icons}/apps/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/${icons}/apps/${_pkgname}.png"
+     done
++    install -Dm644 "${srcdir}/squashfs-root/usr/share/mime/drawio.xml" "${pkgdir}/usr/share/mime/packages/drawio.xml"
+     install -Dm644 "${srcdir}/squashfs-root/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+ }
+diff --git a/launch-drawio b/launch-drawio
+new file mode 100755
+index 0000000..35cdd41
+--- /dev/null
++++ b/launch-drawio
+@@ -0,0 +1,22 @@
++#!/bin/bash
++
++set -euo pipefail
++
++flags_file="${XDG_CONFIG_HOME:-$HOME/.config}/drawio-desktop-flags.conf"
++
++declare -a desktop_flags
++
++if [[ -f "${flags_file}" ]]
++then
++    mapfile -t < "${flags_file}" DESKTOP_MAP_FILE
++fi
++
++for line in "${DESKTOP_MAP_FILE[@]}"
++do
++    if [[ ! "${line}" =~ ^[[:space:]]*#.* ]]
++    then
++        desktop_flags+=("${line}")
++    fi
++done
++
++exec /opt/drawio-desktop-appimage/drawio.AppImage "${desktop_flags[@]}" "$@"

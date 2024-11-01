@@ -1,0 +1,13 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 1f3177d..8fa092b 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -11,7 +11,7 @@ depends=('krb5')
+ conflicts=('mongosh')
+ provides=('mongosh')
+ url='https://github.com/mongodb-js/mongosh.git'
+-license=('Apache')
++license=('Apache-2.0')
+ _mongosh_folder=mongosh-${pkgver}-linux
+ 
+ source_x86_64=("https://downloads.mongodb.com/compass/${_pkgname}-${pkgver}-linux-x64.tgz")

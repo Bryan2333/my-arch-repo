@@ -1,0 +1,13 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 04dd9fc..9d79cac 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -10,7 +10,7 @@
+ # this package with vmware-horizon-client. If you don't plan to install
+ # vmware-horizon-client and don't want to add this dependency, you can
+ # uncomment the line below:
+-#_remove_vmware_keymaps_dependency=y
++_remove_vmware_keymaps_dependency=y
+ 
+ #PKGEXT=.pkg.tar
+ pkgname=vmware-workstation

@@ -1,0 +1,13 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 9dd3d39..b45df76 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -6,7 +6,7 @@ pkgrel=1
+ pkgdesc='Track and control the processes running in your system. KF6 version'
+ arch=(x86_64)
+ url='https://github.com/zvova7890/ksysguard6'
+-license=(LGPL)
++license=('LGPL-2.0-or-later')
+ depends=(gcc-libs
+          glibc
+          kcompletion

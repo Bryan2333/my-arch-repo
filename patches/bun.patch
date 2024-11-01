@@ -1,0 +1,21 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index c50a965..29f70a5 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -39,6 +39,7 @@ prepare() {
+ 
+ 
+ build() {
++  export PATH="${srcdir}/bun-linux-x64:$PATH"
+   mkdir -p ./build
+ 
+   build_webkit
+@@ -51,7 +52,7 @@ build() {
+ }
+ 
+ build_webkit(){
+-
++  export PATH="${srcdir}/bun-linux-x64:$PATH"
+   cd $srcdir/WebKit/
+ 
+   # Adapted from https://github.com/oven-sh/WebKit/blob/main/Dockerfile#L109

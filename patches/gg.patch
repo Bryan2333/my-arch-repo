@@ -1,0 +1,13 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 95936f1..4655709 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -8,7 +8,7 @@ provides=('gg')
+ pkgdesc='A command-line tool for one-click proxy in your research and development without installing v2ray or anything else (only for linux).'
+ arch=('x86_64' 'aarch64' 'arm' 'armv7h' 'armv6h' 'armv7l')
+ url='https://github.com/mzz2017/gg'
+-license=('AGPL')
++license=('AGPL-3.0-or-later')
+ depends=('glibc')
+ makedepends=('go')
+ optdepends=('libcap: for setcap')

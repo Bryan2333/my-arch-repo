@@ -1,0 +1,13 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 3ffd73d..a567b45 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -7,7 +7,7 @@ pkgrel=1
+ pkgdesc="Bash script for downgrading one or more packages to a version in your cache or the A.L.A."
+ arch=('any')
+ url="https://github.com/archlinux-downgrade/$pkgname"
+-license=('GPL')
++license=('GPL-2.0-or-later')
+ backup=(etc/xdg/downgrade/downgrade.conf)
+ source=("downgrade-v$pkgver.tar.gz::https://github.com/archlinux-downgrade/$pkgname/archive/v$pkgver.tar.gz")
+ depends=('pacman-contrib' 'fzf') # pacsort

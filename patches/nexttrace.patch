@@ -1,0 +1,12 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index e089fc1..e5fa6a1 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -6,6 +6,7 @@ arch=('x86_64')
+ url="https://github.com/nxtrace/NTrace-core"
+ license=('GPL-3.0-or-later')
+ makedepends=('go' 'git')
++conflicts=("${pkgname}-bin" "${pkgname}-git")
+ source=("git+https://github.com/nxtrace/NTrace-core.git#tag=v$pkgver")
+ sha256sums=('9a962aa8a00c6fa0fef798d011641a1ecb281ebc3892b1732e6ce076b7861b51')
+ 

@@ -1,0 +1,10 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 640e99d..9fb5698 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -32,4 +32,5 @@ package() {
+ 	cd "$srcdir/$pkgname-$pkgver"
+ 	install -Dm755 target/release/amdgpu_top "$pkgdir/usr/bin/amdgpu_top"
+ 	install -Dm644 assets/amdgpu_top.desktop "$pkgdir/usr/share/applications/amdgpu_top.desktop"
++	install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+ }

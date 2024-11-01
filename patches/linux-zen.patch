@@ -1,0 +1,115 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index 4e3b073..1a6ae69 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -1,9 +1,9 @@
+ # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
+ 
+-pkgbase=linux-zen
++pkgbase=linux-zen-cjktty
+ pkgver=6.11.6.zen1
+ pkgrel=1
+-pkgdesc='Linux ZEN'
++pkgdesc='Linux ZEN (with cjktty-patches)'
+ url='https://github.com/zen-kernel/zen-kernel'
+ arch=(x86_64)
+ license=(GPL-2.0-only)
+@@ -17,18 +17,13 @@ makedepends=(
+   python
+   tar
+   xz
+-
+-  # htmldocs
+-  graphviz
+-  imagemagick
+-  python-sphinx
+-  python-yaml
+-  texlive-latexextra
+ )
+ options=(
+   !debug
+   !strip
+ )
++
++_cjktty_repo="https://github.com/bigshans/cjktty-patches"
+ _srcname=linux-${pkgver%.*}
+ _srctag=v${pkgver%.*}-${pkgver##*.}
+ source=(
+@@ -36,6 +31,9 @@ source=(
+   $url/releases/download/$_srctag/linux-$_srctag.patch.zst{,.sig}
+   config  # the main kernel config file
+ )
++
++source+=("$_cjktty_repo/raw/master/v6.x/cjktty-6.9.patch"
++         "$_cjktty_repo/raw/master/cjktty-add-cjk32x32-font-data.patch")
+ validpgpkeys=(
+   ABAF11C65A2970B130ABE3C479BE3E4300411886  # Linus Torvalds
+   647F28654894E3BD457199BE38DBBDC86092693E  # Greg Kroah-Hartman
+@@ -53,6 +51,12 @@ b2sums=('821eceaa7492122c724ea789a79aa99f61078f06c86fd6f76d08f640b47ea682f7441c4
+         'SKIP'
+         '62d2a70f5f7f21e19a216448cf3dfe774e57afac5117d17092476edf2b77701be65d9d6c9938e05cdc0cecfed7159bad6c61303f7409f424ae72f3a5c76bb00f')
+ 
++sha256sums+=('6714bf3968392e29f19e44514d490ad7ec718c3897003210fd1e499017dd429d'
++             'c648ff21f0a5714743bbae85d6c6e1ed2bf961b6bca976d4c6b4c8d3f6b2739f')
++
++b2sums+=('8e08152d7413fbd00f71e5f09c680ad7b6b4f8bdfbd56b07659ea7ce54a7d738b73c0fa240f3c90133d4cb2e566be94ffaad5ba1ffddbd4dff99ea6587c44b42'
++         '101996793aeede5e456b23b35c2fd4af5c38fd363473dcdda0bce6e21d110a9f88a67e325b1ebf8efef4a7511f135c4f64ff1fc54b8ef925a5df8d6292ba7678')
++
+ export KBUILD_BUILD_HOST=archlinux
+ export KBUILD_BUILD_USER=$pkgbase
+ export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+@@ -76,6 +80,9 @@ prepare() {
+ 
+   echo "Setting config..."
+   cp ../config .config
++  echo "Setting O2 level compile optimization..."
++  scripts/config --disable CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
++  scripts/config --enable CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+   make olddefconfig
+   diff -u ../config .config || :
+ 
+@@ -84,10 +91,13 @@ prepare() {
+ }
+ 
+ build() {
++  export MAKEFLAGS="-j$(nproc) --quiet"
++  export KCFLAGS=" -march=x86-64-v3 -mtune=generic"
++  export KCPPFLAGS="$KCFLAGS"
++
+   cd $_srcname
+   make all
+   make -C tools/bpf/bpftool vmlinux.h feature-clang-bpf-co-re=1
+-  make htmldocs
+ }
+ 
+ _package() {
+@@ -213,29 +223,9 @@ _package-headers() {
+   ln -sr "$builddir" "$pkgdir/usr/src/$pkgbase"
+ }
+ 
+-_package-docs() {
+-  pkgdesc="Documentation for the $pkgdesc kernel"
+-
+-  cd $_srcname
+-  local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
+-
+-  echo "Installing documentation..."
+-  local src dst
+-  while read -rd '' src; do
+-    dst="${src#Documentation/}"
+-    dst="$builddir/Documentation/${dst#output/}"
+-    install -Dm644 "$src" "$dst"
+-  done < <(find Documentation -name '.*' -prune -o ! -type d -print0)
+-
+-  echo "Adding symlink..."
+-  mkdir -p "$pkgdir/usr/share/doc"
+-  ln -sr "$builddir/Documentation" "$pkgdir/usr/share/doc/$pkgbase"
+-}
+-
+ pkgname=(
+   "$pkgbase"
+   "$pkgbase-headers"
+-  "$pkgbase-docs"
+ )
+ for _p in "${pkgname[@]}"; do
+   eval "package_$_p() {

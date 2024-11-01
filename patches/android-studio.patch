@@ -1,0 +1,31 @@
+diff --git a/PKGBUILD b/PKGBUILD
+index e8d7909..26569ec 100644
+--- a/PKGBUILD
++++ b/PKGBUILD
+@@ -15,7 +15,7 @@ pkgrel=1
+ pkgdesc="The official Android IDE (Stable branch)"
+ arch=('i686' 'x86_64')
+ url="https://developer.android.com/"
+-license=('APACHE')
++license=('Apache-2.0')
+ makedepends=()
+ depends=('alsa-lib' 'freetype2' 'libxrender' 'libxtst' 'which')
+ optdepends=('gtk2: GTK+ look and feel'
+@@ -37,7 +37,7 @@ package() {
+   cd $srcdir/$pkgname
+ 
+   # Install the application
+-  install -d $pkgdir/{opt/$pkgname,usr/bin}
++  install -d $pkgdir/{opt/$pkgname,usr/bin,usr/share/icons/hicolor/scalable/apps}
+   cp -a bin lib jbr plugins license LICENSE.txt build.txt product-info.json $pkgdir/opt/$pkgname
+   ln -s /opt/android-studio/bin/studio $pkgdir/usr/bin/$pkgname
+ 
+@@ -46,7 +46,7 @@ package() {
+   install -Dm644 $srcdir/license.html "${pkgdir}/usr/share/licenses/${pkgname}/license.html"
+ 
+   # Add the icon and desktop file
+-  install -Dm644 bin/studio.png $pkgdir/usr/share/pixmaps/$pkgname.png
++  ln -s /opt/android-studio/bin/studio.svg $pkgdir/usr/share/icons/hicolor/scalable/apps/$pkgname.svg
+   install -Dm644 $srcdir/$pkgname.desktop $pkgdir/usr/share/applications/$pkgname.desktop
+ 
+   chmod -R ugo+rX $pkgdir/opt

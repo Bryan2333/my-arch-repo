@@ -1,0 +1,6 @@
+[
+    {
+        "name": "linux-zen",
+        "url": "https://gitlab.archlinux.org/archlinux/packaging/packages/linux-zen.git"
+    }
+]
