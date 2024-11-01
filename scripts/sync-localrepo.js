@@ -109,7 +109,7 @@ function packageToDownload(options) {
 
     console.log("============ 需要下载的软件包 =================");
     packages_to_download.forEach((pkg) => {
-        console.log(pkg.name);
+        console.log(pkg.filename);
     });
     console.log("===============================================");
 
