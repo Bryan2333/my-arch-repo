@@ -1,0 +1,29 @@
+{
+  "name": "my-arch-repo",
+  "version": "1.0.0",
+  "description": "My ArchLinux Repository",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "sync-localrepo": "node ./scripts/sync-localrepo.js",
+    "remove-oldpackages": "node ./scripts/remove-old-packages.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bryan2333/my-arch-repo.git"
+  },
+  "author": "Bryan2333",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bryan2333/my-arch-repo/issues"
+  },
+  "homepage": "https://github.com/Bryan2333/my-arch-repo#readme",
+  "dependencies": {
+    "@octokit/core": "^6.1.2",
+    "axios": "^1.7.7",
+    "zx": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.8.6"
+  }
+}

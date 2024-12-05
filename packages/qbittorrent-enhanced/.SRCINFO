@@ -1,0 +1,25 @@
+pkgbase = qbittorrent-enhanced
+	pkgdesc = A bittorrent client powered by C++, Qt and libtorrent (Enhanced Edition)
+	pkgver = 5.0.2.10
+	pkgrel = 1
+	url = https://github.com/c0re100/qBittorrent-Enhanced-Edition
+	arch = x86_64
+	license = GPL-2.0-or-later
+	makedepends = cmake
+	makedepends = boost>=1.65
+	makedepends = qt6-tools
+	depends = gcc-libs
+	depends = glibc
+	depends = libtorrent-rasterbar
+	depends = openssl
+	depends = qt6-base
+	depends = qt6-svg
+	depends = hicolor-icon-theme
+	depends = zlib
+	optdepends = python: needed for torrent search tab
+	provides = qbittorrent
+	conflicts = qbittorrent
+	source = qbittorrent-enhanced-5.0.2.10.tar.gz::https://github.com/c0re100/qBittorrent-Enhanced-Edition/archive/release-5.0.2.10.tar.gz
+	sha256sums = 425753dcdcca1a40da2996343a8ce22b45797cf4d7305db897bf61bcb56685f5
+
+pkgname = qbittorrent-enhanced

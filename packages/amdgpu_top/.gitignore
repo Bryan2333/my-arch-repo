@@ -1,0 +1,5 @@
+chroot/
+pkg/
+src/
+*.pkg.tar.zst
+*.tar.gz

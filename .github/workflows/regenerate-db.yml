@@ -1,0 +1,21 @@
+name: Regenerate Database
+
+on:
+  workflow_dispatch:
+
+jobs:
+   regenerate-db:
+     runs-on: ubuntu-latest
+     steps:
+       - name: Checkout
+         uses: actions/checkout@v4
+
+       - name: Generate Database
+         env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           REPO_INFO: ${{ github.repository	}}
+         run: |
+           docker run -t -v ${{ github.workspace }}:/build \
+             -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+             -e REPO_INFO=${{ github.repository }} \
+             archlinux:latest /bin/bash /build/scripts/regenerate-db.sh

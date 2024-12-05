@@ -1,0 +1,25 @@
+name: Remove Old Packages
+
+on:
+  workflow_dispatch:
+
+jobs:
+   remove-old-packages:
+     runs-on: ubuntu-latest
+     steps:
+       - name: Checkout
+         uses: actions/checkout@v4
+
+       - name: Use Node.JS lts/iron
+         uses: actions/setup-node@v4
+         with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+       - name: Install Dependencies
+         run: npm install
+
+       - name: Remove Old Packages
+         run: npm run remove-oldpackages
+         env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
