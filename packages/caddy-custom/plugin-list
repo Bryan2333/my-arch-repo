@@ -1,0 +1,6 @@
+# Please put the plugins you need below. One plugin per line.
+github.com/caddyserver/forwardproxy=github.com/klzgrad/forwardproxy@naive
+github.com/caddyserver/jsonc-adapter
+github.com/caddyserver/json5-adapter
+github.com/abiosoft/caddy-yaml
+github.com/awoodbeck/caddy-toml-adapter
