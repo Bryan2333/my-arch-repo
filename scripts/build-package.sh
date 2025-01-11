@@ -80,9 +80,47 @@ function process_deps() {
 
     if [[ -f "aur_deps" ]]
     then
+        local -r PKG_REGEX='^([a-zA-Z0-9_.+-]+)-([0-9a-zA-Z_.+-]+)-([0-9]+)-([a-zA-Z0-9_.+-]+)\.pkg\.tar\.(zst|xz|gz)$'
+
+        declare -A remote_packages_map
+        mapfile -t remote_packages_url < <(curl --silent https://api.github.com/repos/bryan2333/my-arch-repo/releases/latest | jq -r '.assets[] | select(.browser_download_url) | .browser_download_url')
+
+        for url in "${remote_packages_url[@]}"
+        do
+            package_file="$(basename "${url}")"
+            remote_packages_map["${package_file}"]="${url}"
+        done
+
         while IFS= read -r dep
         do
-            build_package "${dep}"
+            for package_file in "${!remote_packages_map[@]}"
+            do
+                if [[ "${package_file}" =~ ${PKG_REGEX} ]]
+                then
+                    if [[ "${BASH_REMATCH[1]}" != "${dep}" ]]
+                    then
+                        continue
+                    fi
+
+                    local pkgver_in_remote="${BASH_REMATCH[2]}-${BASH_REMATCH[3]}"
+                    local pkgver_in_aur
+
+                    pkgver_in_aur="$(curl --silent https://aur.archlinux.org/rpc/v5/info?arg[]="${dep}" | jq -r '.results[].Version')"
+
+                    if [[ "$(vercmp "$pkgver_in_remote" "$pkgver_in_aur")" -lt 0 ]]
+                    then
+                        echo "AUR package is newer than remote package"
+                        build_package "${dep}"
+                    else
+                        remote_url="${remote_packages_map["${package_file}"]}"
+                        { 
+                            wget "${remote_url}" 
+                            pacman -U --noconfirm "${package_file}"
+                            rm -rf "${package_file}" 
+                        } || echo "Failed to download ${package_file} from remote repo"
+                    fi
+                fi
+            done 
         done < aur_deps
     fi
 }
