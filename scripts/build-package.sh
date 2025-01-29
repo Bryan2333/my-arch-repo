@@ -83,7 +83,7 @@ function process_deps() {
         local -r PKG_REGEX='^([a-zA-Z0-9_.+-]+)-([0-9a-zA-Z_.+-]+)-([0-9]+)-([a-zA-Z0-9_.+-]+)\.pkg\.tar\.(zst|xz|gz)$'
 
         declare -A remote_packages_map
-        mapfile -t remote_packages_url < <(curl --silent https://api.github.com/repos/bryan2333/my-arch-repo/releases/latest | jq -r '.assets[] | select(.browser_download_url) | .browser_download_url')
+        mapfile -t remote_packages_url < <(curl --silent https://api.github.com/repos/bryan2333/my-arch-repo/releases/latest | jq -r '.assets | sort_by(.created_at) | reverse | .[].browser_download_url')
 
         for url in "${remote_packages_url[@]}"
         do
@@ -119,6 +119,8 @@ function process_deps() {
                             rm -rf "${package_file}" 
                         } || echo "Failed to download ${package_file} from remote repo"
                     fi
+
+                    break
                 fi
             done 
         done < aur_deps
