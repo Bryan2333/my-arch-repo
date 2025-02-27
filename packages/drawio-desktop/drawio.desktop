@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=drawio
+Comment=A diagramming and whiteboarding desktop app
+Exec=/usr/bin/drawio %U
+Terminal=false
+Type=Application
+Icon=drawio
+StartupWMClass=drawio
+Categories=Graphics;
+MimeType=application/vnd.jgraph.mxfile;application/vnd.ms-visio.drawing.main+xml;

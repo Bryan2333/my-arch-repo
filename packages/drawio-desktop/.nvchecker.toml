@@ -1,0 +1,5 @@
+[drawio-desktop]
+source = "github"
+github = "jgraph/drawio-desktop"
+prefix = "v"
+use_latest_release = true
