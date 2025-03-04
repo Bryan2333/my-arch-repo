@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "sync-localrepo": "node ./scripts/sync-localrepo.js",
+    "sync-localrepo": "node ./scripts/sync-localrepo.cjs",
     "remove-oldpackages": "node ./scripts/remove-old-packages.js"
   },
   "repository": {

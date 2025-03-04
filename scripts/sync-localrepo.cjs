@@ -168,14 +168,14 @@ function packageToDownload(options) {
 /**
  * @param {Map<String, Package>} packages_to_download
  */
-function downloadPackage(packages_to_download) {
+async function downloadPackage(packages_to_download) {
     for (const pkg of packages_to_download.values()) {
         console.log(`正在下载 ${pkg.filename}`);
-        $.sync`curl --retry 3 -O -L --output-dir ${LOCAL_REPO_DIR} ${REMOTE_REPO_DIR}/${pkg.filename}`;
+        await $`curl --retry 3 -O -L --output-dir ${LOCAL_REPO_DIR} ${REMOTE_REPO_DIR}/${pkg.filename}`;
     }
 }
 
-function main() {
+async function main() {
     const argv = yargs(hideBin(process.argv))
         .usage("Usage: $0 [options]")
         .boolean("update-only")
@@ -211,7 +211,7 @@ function main() {
     const pkgs = packageToDownload(options);
 
     if (!options.dryrun) {
-        downloadPackage(pkgs);
+        await downloadPackage(pkgs);
     }
 }
 
