@@ -1,0 +1,16 @@
+diff --git a/redisinsight/desktop/app.ts b/redisinsight/desktop/app.ts
+index 2a12fb4d4..eb77c9080 100644
+--- a/redisinsight/desktop/app.ts
++++ b/redisinsight/desktop/app.ts
+@@ -38,8 +38,9 @@ const init = async () => {
+ 
+   nativeTheme.themeSource = electronStore?.get(ElectronStorageItem.themeSource) || config.themeSource
+ 
++  app.setDesktopName("redisinsight")
+   app.setName(config.name)
+-  app.setAppUserModelId(config.name)
++  app.setAppUserModelId("redisinsight")
+   if (process.platform !== 'darwin') {
+     app.setAboutPanelOptions(AboutPanelOptions)
+   }
+

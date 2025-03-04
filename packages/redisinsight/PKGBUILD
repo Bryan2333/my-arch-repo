@@ -1,6 +1,6 @@
 # Maintainer: Dan Walsh <dan@danwalsh.ca>
 pkgname=redisinsight
-pkgver=2.64.1
+pkgver=2.66.0
 pkgrel=2
 pkgdesc="Desktop manager that provides an intuitive and efficient GUI for Redis, allowing you to interact with your databases, monitor, and manage your data."
 arch=('x86_64')
@@ -19,12 +19,15 @@ jq
 make
 python-setuptools
 clang
+git
 )
 source=("$pkgname-$pkgver.tar.gz::https://github.com/RedisInsight/RedisInsight/archive/$pkgver.tar.gz")
-sha256sums=('850ea1cb2dc9b6a77df253447e163c50ede91a59d7d8e6f0047f158593fcb2db')
+sha256sums=('acee9e65845befbd5f3597777d5b8a68f011d70d850fb1946c99aa393d28b5cd')
 
-source+=("launch-redisinsight")
-sha256sums+=("2440c762fbfeadb4536a51b28de07159cac042aad42148be76a3134709675648")
+source+=("launch-redisinsight"
+         "fix-wayland-icon.patch")
+sha256sums+=("2440c762fbfeadb4536a51b28de07159cac042aad42148be76a3134709675648"
+             "540b3a6d27cfa1821c0413da935ea1f649beac86d0f1907aa61c5a8eada5ac03")
 
 _ensure_local_nvm() {
     # let's be sure we are starting clean
@@ -42,9 +45,12 @@ prepare() {
 
   # unable to build some plugins for some reason, disable them here
   sed -i -E '/^# Build ri-explain plugin/,$d' scripts/build-statics.sh
+  
+  # bypass confirmation prompt for npx
+  sed -i -E 's/"postinstall": "npx patch-package"/"postinstall": "npx --yes patch-package"/' redisinsight/package.json
 
-  # automatically accept installing npx package
-  echo "$(jq '.scripts.postinstall = "npx --yes patch-package"' redisinsight/package.json)" > redisinsight/package.json
+  # apply fix appid patch
+  patch -Np1 < "${srcdir}/fix-wayland-icon.patch"
 
   _ensure_local_nvm
   nvm install 20.12.2
@@ -54,7 +60,7 @@ build() {
   cd RedisInsight-$pkgver
   _ensure_local_nvm
 
-  mkdir electron
+  mkdir -p electron
   VERSION=$(jq -r ".version" redisinsight/package.json)
   cp ./redisinsight/package.json ./electron/package.json
   echo "$VERSION" > electron/version
