@@ -7,7 +7,7 @@
 pkgname=github-desktop
 pkgver=3.4.14
 _gitname="release-$pkgver-linux1"
-pkgrel=1
+pkgrel=2
 pkgdesc='GUI for managing Git and GitHub'
 arch=(x86_64)
 url='https://desktop.github.com'
@@ -38,8 +38,10 @@ sha256sums=('59d9214328a9612a1e3463df69d9956c87c92fe23c97dc647ed4b063fdb12bb8'
             'SKIP'
             '932e4c456e8c6db03d27172cf0daa37806bf025bb560d8b3d758c0997d1a618c')
 
-source+=("launch-github-desktop")
-sha256sums+=("03622e056540df8374eff814ca4127be40bbcb1d5430e400af6a34246d0ac986")
+source+=("launch-github-desktop"
+         "fix-wayland-icon.patch")
+sha256sums+=("03622e056540df8374eff814ca4127be40bbcb1d5430e400af6a34246d0ac986"
+             "e25623782a3d8cda4c43701672040d9ec0dd848d0f16c989544ea23f10917261")
 
 _nvm_install_node() {
 	local NVM_DIR="${srcdir}/.nvm"
@@ -57,6 +59,8 @@ prepare() {
 	git -c protocol.file.allow=always submodule update
 	# https://github.com/shiftkey/desktop/issues/809#issuecomment-1348815685
 	sed -e '/compile:prod/s/4096/4096 --openssl-legacy-provider/' -i package.json
+    # apply fix wayland icon patch
+    patch -Np1 < "${srcdir}/fix-wayland-icon.patch"
 }
 
 build() {
