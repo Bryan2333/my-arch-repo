@@ -57,12 +57,15 @@ function build_package() {
     cd "${_pkg}" || exit 1
 
     (
-        source PKGBUILD
+        if grep -qE "validpgpkeys" PKGBUILD
+        then
+            source PKGBUILD
 
-        for key in "${validpgpkeys[@]}"
-        do
-            builder_do gpg --recv-keys "${key}" || echo "Failed to import key: ${key}"
-        done
+            for key in "${validpgpkeys[@]}"
+            do
+                builder_do gpg --recv-keys "${key}" || echo "Failed to import key: ${key}"
+            done
+        fi
     )
 
     local _makepkg_args=("--syncdeps" "--clean" "--noconfirm")
