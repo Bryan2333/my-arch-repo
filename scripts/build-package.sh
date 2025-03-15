@@ -56,12 +56,14 @@ function build_package() {
 
     cd "${_pkg}" || exit 1
 
-    { 
-        grep -Po 'validpgpkeys\s*=\s*\K.*' .SRCINFO | tr ',' '\n' | while read -r key
+    (
+        source PKGBUILD
+
+        for key in "${validpgpkeys[@]}"
         do
             builder_do gpg --recv-keys "${key}" || echo "Failed to import key: ${key}"
-        done 
-    } || echo "No keys need to import"
+        done
+    )
 
     local _makepkg_args=("--syncdeps" "--clean" "--noconfirm")
 
