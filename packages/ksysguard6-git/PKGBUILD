@@ -24,6 +24,7 @@ depends=(gcc-libs
          kwindowsystem
          kxmlgui
          libksysguard
+         libxres
          lm_sensors
          qt6-base
          zlib)
