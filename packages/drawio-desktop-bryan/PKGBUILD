@@ -3,7 +3,7 @@
 
 _pkgname=drawio-desktop
 pkgname="$_pkgname-bryan"
-pkgver=26.0.16
+pkgver=26.1.1
 pkgrel=1
 pkgdesc="Official Electron build of draw.io"
 arch=(any)
@@ -30,8 +30,8 @@ source=(
   "drawio.sh"
   "drawio.xml"
 )
-sha256sums=('SKIP'
-            'SKIP'
+sha256sums=('227269bd38c9ffbcfca1682e2557375aff9b9ebb9531842421f0d7b6783fbcb5'
+            'bcf08ed44bef689d6151f5f941c7a1bf8e489af7193590ac52c4476e410ccae6'
             '1064adf2cb2cd69a95d0f820000f48291a19698df707bef8f1aff0b8d368cf4a'
             'd3a12d0e3904555c1ffcef3b55ea871e87b3a7f99e8e7fec1c05c7357a04d123'
             '53fb8df9cd9101d79fd897880dc7c59b3e90cf5d980029a1ecaa5da3031f8606')
@@ -46,7 +46,7 @@ prepare() {
 
   grep -q "\"version\": \"$pkgver\"" package.json \
     || ( echo "Version mismatch in package.json"; exit 1 )
-  grep -qE "\"electron\": \".*$_electronver\." package.json \
+  grep -qE '"electron": "\^?'$_electronver package.json \
     || ( echo "Electron version mismatch in package.json"; exit 1 )
   grep -q "\"node\": \">=$_nodever\"" package.json \
     || ( echo "Node version mismatch in package.json"; exit 1 )
