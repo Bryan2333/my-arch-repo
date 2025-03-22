@@ -1,7 +1,7 @@
 # Maintainer: Dan Walsh <dan@danwalsh.ca>
 pkgname=redisinsight
 pkgver=2.66.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Desktop manager that provides an intuitive and efficient GUI for Redis, allowing you to interact with your databases, monitor, and manage your data."
 arch=('x86_64')
 url='https://redis.com/redis-enterprise/redis-insight'
@@ -26,7 +26,7 @@ sha256sums=('acee9e65845befbd5f3597777d5b8a68f011d70d850fb1946c99aa393d28b5cd')
 
 source+=("launch-redisinsight"
          "fix-wayland-icon.patch")
-sha256sums+=("2440c762fbfeadb4536a51b28de07159cac042aad42148be76a3134709675648"
+sha256sums+=("c7df33ac5fa397660849792579a5edeb9194a14483705c1d1e154bf6aeb33719"
              "540b3a6d27cfa1821c0413da935ea1f649beac86d0f1907aa61c5a8eada5ac03")
 
 _ensure_local_nvm() {
