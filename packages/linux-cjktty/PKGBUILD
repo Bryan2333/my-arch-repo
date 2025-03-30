@@ -2,7 +2,7 @@
 
 pkgbase=linux-cjktty
 pkgver=6.13.7.arch1
-pkgrel=1
+pkgrel=2
 pkgdesc='Linux (with cjktty-patches)'
 url='https://github.com/archlinux/linux'
 arch=(x86_64)
@@ -34,7 +34,8 @@ source=(
   config  # the main kernel config file
 )
 source+=("$_cjktty_repo/raw/master/v6.x/cjktty-6.9.patch"
-         "$_cjktty_repo/raw/master/cjktty-add-cjk32x32-font-data.patch")
+         "$_cjktty_repo/raw/master/cjktty-add-cjk32x32-font-data.patch"
+         "0001-wifi-iwlwifi-don-t-warn-if-the-NIC-is-gone-in-resume.patch")
 validpgpkeys=(
   ABAF11C65A2970B130ABE3C479BE3E4300411886  # Linus Torvalds
   647F28654894E3BD457199BE38DBBDC86092693E  # Greg Kroah-Hartman
@@ -53,10 +54,12 @@ b2sums=('dc9e71842d7e9d2e016ca2c6e791d627790c87cd445b404c73745dc565eb89617ec69f1
         '0f51ac4a2500faa66377c6f90e0f9c433032c6836aa9b6772276fc5ad792fa0f8c15d68390191c2cc887cf3649186429438dacbd0df0f5b052647e3f98f4ad93')
 
 sha256sums+=('6714bf3968392e29f19e44514d490ad7ec718c3897003210fd1e499017dd429d'
-             'c648ff21f0a5714743bbae85d6c6e1ed2bf961b6bca976d4c6b4c8d3f6b2739f')
+             'c648ff21f0a5714743bbae85d6c6e1ed2bf961b6bca976d4c6b4c8d3f6b2739f'
+             '5a3d9dff035b2840be510f772dee4d6a6ebacb738a39c87a7d282a506e0d1a31')
 
 b2sums+=('8e08152d7413fbd00f71e5f09c680ad7b6b4f8bdfbd56b07659ea7ce54a7d738b73c0fa240f3c90133d4cb2e566be94ffaad5ba1ffddbd4dff99ea6587c44b42'
-         '101996793aeede5e456b23b35c2fd4af5c38fd363473dcdda0bce6e21d110a9f88a67e325b1ebf8efef4a7511f135c4f64ff1fc54b8ef925a5df8d6292ba7678')
+         '101996793aeede5e456b23b35c2fd4af5c38fd363473dcdda0bce6e21d110a9f88a67e325b1ebf8efef4a7511f135c4f64ff1fc54b8ef925a5df8d6292ba7678'
+         '01851a9c9f79261e94507790b186639e772b4251512edf12f89047a1b121ca81e0681c42b365591ddca8767f992b45f6e53b769eb0e53589cd0a026ff1aaecc3')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase

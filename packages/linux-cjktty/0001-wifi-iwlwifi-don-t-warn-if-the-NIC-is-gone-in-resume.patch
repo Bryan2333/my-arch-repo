@@ -1,0 +1,120 @@
+From c0cebe9a1e9305aa919b844d423bea47357bc8c5 Mon Sep 17 00:00:00 2001
+From: Emmanuel Grumbach <emmanuel.grumbach@intel.com>
+Date: Thu, 27 Mar 2025 05:35:15 +0200
+Subject: [PATCH] wifi: iwlwifi: don't warn if the NIC is gone in resume
+
+Some BIOSes decide to power gate the WLAN device during S3. Since
+iwlwifi doesn't expect this, it gets very noisy reporting that the
+device is no longer available. Wifi is still available because iwlwifi
+recovers, but it spews scary prints in the log.
+
+Fix that by failing gracefully.
+
+type=bugfix
+ticket=none
+fixes=I613d17c712de7a0d611cde4e14f37ebbe0c3c964
+
+Fixes: e8bb19c1d590 ("wifi: iwlwifi: support fast resume")
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=219597
+Change-Id: I569ca15eaaa774d633038a749cc6ec7448419714
+Signed-off-by: Emmanuel Grumbach <emmanuel.grumbach@intel.com>
+---
+ drivers/net/wireless/intel/iwlwifi/pcie/drv.c      | 13 ++++++++++---
+ drivers/net/wireless/intel/iwlwifi/pcie/internal.h |  6 +++---
+ drivers/net/wireless/intel/iwlwifi/pcie/trans.c    |  9 +++++++--
+ drivers/net/wireless/intel/iwlwifi/pcie/tx.c       |  2 +-
+ 4 files changed, 21 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/drv.c b/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
+index 93446c374008..6f41c6bfc45f 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
+@@ -1760,10 +1760,17 @@ static int _iwl_pci_resume(struct device *device, bool restore)
+ 	 * need to reset it completely.
+ 	 * Note: MAC (bits 0:7) will be cleared upon suspend even with wowlan,
+ 	 * so assume that any bits there mean that the device is usable.
++	 * For older devices, just try silently to grab the NIC.
+ 	 */
+-	if (trans->trans_cfg->device_family >= IWL_DEVICE_FAMILY_BZ &&
+-	    !iwl_read32(trans, CSR_FUNC_SCRATCH))
+-		device_was_powered_off = true;
++	if (trans->trans_cfg->device_family >= IWL_DEVICE_FAMILY_BZ) {
++		if (!iwl_read32(trans, CSR_FUNC_SCRATCH))
++			device_was_powered_off = true;
++	} else {
++		if (_iwl_trans_pcie_grab_nic_access(trans, true))
++			iwl_trans_pcie_release_nic_access(trans);
++		else
++			device_was_powered_off = true;
++	}
+ 
+ 	if (restore || device_was_powered_off) {
+ 		trans->state = IWL_TRANS_NO_FW;
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/internal.h b/drivers/net/wireless/intel/iwlwifi/pcie/internal.h
+index 45460f93d24a..50c0b3a4b6d7 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/internal.h
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/internal.h
+@@ -558,10 +558,10 @@ void iwl_trans_pcie_free(struct iwl_trans *trans);
+ void iwl_trans_pcie_free_pnvm_dram_regions(struct iwl_dram_regions *dram_regions,
+ 					   struct device *dev);
+ 
+-bool __iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans);
+-#define _iwl_trans_pcie_grab_nic_access(trans)			\
++bool __iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans, bool silent);
++#define _iwl_trans_pcie_grab_nic_access(trans, silent)		\
+ 	__cond_lock(nic_access_nobh,				\
+-		    likely(__iwl_trans_pcie_grab_nic_access(trans)))
++		    likely(__iwl_trans_pcie_grab_nic_access(trans, silent)))
+ 
+ void iwl_trans_pcie_check_product_reset_status(struct pci_dev *pdev);
+ void iwl_trans_pcie_check_product_reset_mode(struct pci_dev *pdev);
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/trans.c b/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+index c917ed4c19bc..8b2f80748fe2 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+@@ -2405,7 +2405,7 @@ EXPORT_SYMBOL(iwl_trans_pcie_reset);
+  * This version doesn't disable BHs but rather assumes they're
+  * already disabled.
+  */
+-bool __iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans)
++bool __iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans, bool silent)
+ {
+ 	int ret;
+ 	struct iwl_trans_pcie *trans_pcie = IWL_TRANS_GET_PCIE_TRANS(trans);
+@@ -2457,6 +2457,11 @@ bool __iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans)
+ 	if (unlikely(ret < 0)) {
+ 		u32 cntrl = iwl_read32(trans, CSR_GP_CNTRL);
+ 
++		if (silent) {
++			spin_unlock(&trans_pcie->reg_lock);
++			return false;
++		}
++
+ 		WARN_ONCE(1,
+ 			  "Timeout waiting for hardware access (CSR_GP_CNTRL 0x%08x)\n",
+ 			  cntrl);
+@@ -2488,7 +2493,7 @@ bool iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans)
+ 	bool ret;
+ 
+ 	local_bh_disable();
+-	ret = __iwl_trans_pcie_grab_nic_access(trans);
++	ret = __iwl_trans_pcie_grab_nic_access(trans, false);
+ 	if (ret) {
+ 		/* keep BHs disabled until iwl_trans_pcie_release_nic_access */
+ 		return ret;
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/tx.c b/drivers/net/wireless/intel/iwlwifi/pcie/tx.c
+index 7c1dd5cc084a..83c6fcafcf1a 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/tx.c
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/tx.c
+@@ -1021,7 +1021,7 @@ static int iwl_pcie_set_cmd_in_flight(struct iwl_trans *trans,
+ 	 * returned. This needs to be done only on NICs that have
+ 	 * apmg_wake_up_wa set (see above.)
+ 	 */
+-	if (!_iwl_trans_pcie_grab_nic_access(trans))
++	if (!_iwl_trans_pcie_grab_nic_access(trans, false))
+ 		return -EIO;
+ 
+ 	/*
+-- 
+2.49.0
+
