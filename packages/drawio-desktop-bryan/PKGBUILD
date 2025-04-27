@@ -1,81 +1,107 @@
-# Maintainer: Carl Smedstad <carsme@archlinux.org>
-# Contributor: Dmitry Valter <`echo ZHZhbHRlciA8YXQ+IHByb3Rvbm1haWwgPGRvdD4gY29tCg== | base64 -d`>
+# Maintainer: BryanLiang <liangrui.ch at gmail dot com>
 
 _pkgname=drawio-desktop
-pkgname="$_pkgname-bryan"
-pkgver=26.1.1
+pkgname="${_pkgname}"-bryan
+pkgver=26.2.15
 pkgrel=1
-pkgdesc="Official Electron build of draw.io"
-arch=(any)
+pkgdesc="Diagram drawing application built on web technology"
+arch=('x86_64')
 url="https://www.drawio.com"
-provides=("drawio-desktop")
-conflicts=("drawio-desktop")
-license=(Apache-2.0)
-_electronver=34
-_nodever=20
+license=('Apache-2.0')
 depends=(
-  "electron$_electronver"
-  hicolor-icon-theme
-  sh
+    "bash"
+    "gtk3"
+    "libnotify"
+    "libxss"
+    "nss"
+    "alsa-lib"
 )
 makedepends=(
-  "nodejs>=$_nodever"
-  git
-  yarn
+    "git"
+    "nvm"
+    "libxcrypt-compat"
 )
+provides=('drawio-desktop')
+conflicts=('drawio-desktop')
 source=(
-  "git+https://github.com/jgraph/drawio-desktop.git#tag=v$pkgver"
-  "git+https://github.com/jgraph/drawio.git#tag=v$pkgver"
-  "drawio.desktop"
-  "drawio.sh"
-  "drawio.xml"
+    "git+https://github.com/jgraph/drawio-desktop.git#tag=v$pkgver"
+    "git+https://github.com/jgraph/drawio.git#tag=v$pkgver"
+    "01-only-build-for-linux-x64.patch"
+    "02-disable-auto-updates.patch"
+    "launch-drawio"
 )
-sha256sums=('227269bd38c9ffbcfca1682e2557375aff9b9ebb9531842421f0d7b6783fbcb5'
-            'bcf08ed44bef689d6151f5f941c7a1bf8e489af7193590ac52c4476e410ccae6'
-            '1064adf2cb2cd69a95d0f820000f48291a19698df707bef8f1aff0b8d368cf4a'
-            'd3a12d0e3904555c1ffcef3b55ea871e87b3a7f99e8e7fec1c05c7357a04d123'
-            '53fb8df9cd9101d79fd897880dc7c59b3e90cf5d980029a1ecaa5da3031f8606')
+sha256sums=(
+    'SKIP'
+    'SKIP'
+    '535fe449d329790cd474a4e2d2caffae34694a9df0812b380c0f4cbe0067a9f7'
+    '248a44b4830b846fb1802d7a71218405d888aca783750954643f5639ed9093b3'
+    '7e7984cf831d7d8d970b2f217782e7b281a1492cacf92a8f3ce2dc73a24cb626'
+)
+
+_ensure_local_nvm() {
+    # let's be sure we are starting clean
+    which nvm >/dev/null 2>&1 && nvm deactivate && nvm unload
+    export NVM_DIR="${srcdir}/.nvm"
+
+    # The init script returns 3 if version specified
+    # in ./.nvrc is not (yet) installed in $NVM_DIR
+    # but nvm itself still gets loaded ok
+    source /usr/share/nvm/init-nvm.sh || [[ $? != 1 ]]
+}
+
 
 prepare() {
-  cd $_pkgname
-  sed -i "s/@_electronver@/$_electronver/" "$srcdir/drawio.sh"
+    cd "${_pkgname}"
+    git submodule init
+    git config submodule.drawio.url "${srcdir}/drawio"
+    git -c protocol.file.allow=always submodule update
 
-  git submodule init
-  git config submodule.drawio.url "$srcdir/drawio"
-  git -c protocol.file.allow=always submodule update
+    patch -Np1 < "${srcdir}/01-only-build-for-linux-x64.patch"
+    patch -Np1 < "${srcdir}/02-disable-auto-updates.patch"
 
-  grep -q "\"version\": \"$pkgver\"" package.json \
-    || ( echo "Version mismatch in package.json"; exit 1 )
-  grep -qE '"electron": "\^?'$_electronver package.json \
-    || ( echo "Electron version mismatch in package.json"; exit 1 )
-  grep -q "\"node\": \">=$_nodever\"" package.json \
-    || ( echo "Node version mismatch in package.json"; exit 1 )
+    _ensure_local_nvm
 
-  # Disable auto-updates
-  sed -i 's/return false;/return true;/' src/main/disableUpdate.js
+    nvm install lts/jod
+    nvm use lts/jod
 
-  yarn install --frozen-lockfile
+    npm install
 }
 
 build() {
-  cd "$srcdir/$_pkgname"
-  yarn run electron-builder --linux dir \
-    -c.electronDist=/usr/lib/electron$_electronver \
-    -c.electronVersion=$_electronver
+    cd "${_pkgname}"
 
-  sed -i '/^StartupWMClass/d' "$srcdir/drawio.desktop"
+    _ensure_local_nvm
+    nvm use lts/jod
+
+    npm run release-linux 
+
+    mkdir "${srcdir}/tmp"
+
+    mv "dist/draw.io-amd64-${pkgver}.deb" "${srcdir}/tmp"
+
+    cd "${srcdir}/tmp"
+
+    ar x "draw.io-amd64-${pkgver}.deb"
+
+    [[ -f "data.tar.xz" ]] && bsdtar -xf data.tar.xz
+
+    rm -r "usr/share/doc"
+
+    sed -i \
+        -e "s|Exec=.*|Exec=/usr/bin/drawio %U|" \
+        -e '/^StartupWMClass/d' \
+        "usr/share/applications/drawio.desktop"
+
+    mv "usr/share/applications/drawio.desktop" "usr/share/applications/draw.io.desktop"
 }
 
 package() {
-  cd "$srcdir/$_pkgname"
-  install -vDm644 -t "$pkgdir/usr/lib/$_pkgname" dist/linux-unpacked/resources/app.asar
-  install -vDm755 "$srcdir/drawio.sh" "$pkgdir/usr/bin/drawio"
+    cd "${srcdir}/tmp"
+    install -dm755 "${pkgdir}/opt"
 
-  install -vDm644 "$srcdir/drawio.xml" "$pkgdir/usr/share/mime/packages/drawio.xml"
-  install -vDm644 "$srcdir/drawio.desktop" "$pkgdir/usr/share/applications/draw.io.desktop" 
+    cp -r "opt/draw.io" "${pkgdir}/opt/drawio-desktop"
+    cp -r "usr" "${pkgdir}/"
 
-  for icon in $(find build -regex '.*/[0-9]+x[0-9]+\.png' | sort -n); do
-    size=$(basename -s .png "$icon")
-    install -vDm644 "build/$size.png" "$pkgdir/usr/share/icons/hicolor/$size/apps/drawio.png"
-  done
+    install -Dm 755 "${srcdir}/launch-drawio" "${pkgdir}/usr/bin/drawio"
 }
+

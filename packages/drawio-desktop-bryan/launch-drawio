@@ -1,9 +1,8 @@
 #!/bin/bash
 
-set -eu
+set -euo pipefail
 
-name=electron@_electronver@
-flags_file="${XDG_CONFIG_HOME:-$HOME/.config}/${name}-flags.conf"
+flags_file="${XDG_CONFIG_HOME:-$HOME/.config}/drawio-desktop-flags.conf"
 fallback_file="${XDG_CONFIG_HOME:-$HOME/.config}/electron-flags.conf"
 
 lines=()
@@ -20,10 +19,4 @@ for line in "${lines[@]}"; do
     fi
 done
 
-: "${ELECTRON_IS_DEV:=0}"
-export ELECTRON_IS_DEV
-: "${ELECTRON_FORCE_IS_PACKAGED:=true}"
-export ELECTRON_FORCE_IS_PACKAGED
-export NODE_ENV=production
-
-exec /usr/lib/${name}/electron /usr/lib/drawio-desktop/app.asar "${flags[@]}" "$@"
+exec /opt/drawio-desktop/drawio "$@" "${flags[@]}"

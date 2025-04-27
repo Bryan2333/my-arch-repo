@@ -1,0 +1,38 @@
+diff --git a/electron-builder-linux-mac.json b/electron-builder-linux-mac.json
+index a7fedf6..6b161a0 100644
+--- a/electron-builder-linux-mac.json
++++ b/electron-builder-linux-mac.json
+@@ -44,19 +44,8 @@
+     "maintainer": "JGraph <support@draw.io>",
+     "icon": "./build",
+     "target": [
+-      { "target": "AppImage", "arch": [
+-          "x64",
+-          "arm64"
+-        ]
+-      },
+       { "target": "deb", "arch": [
+-          "x64",
+-          "arm64"
+-        ]
+-      },
+-      { "target": "rpm", "arch": [
+-          "x64",
+-          "arm64"
++          "x64"
+         ]
+       }
+     ]
+diff --git a/package.json b/package.json
+index a636a0f..3c1777a 100644
+--- a/package.json
++++ b/package.json
+@@ -15,7 +15,7 @@
+     "release-win32": "electron-builder --config electron-builder-win32.json --publish always",
+     "release-win-arm64": "electron-builder --config electron-builder-win-arm64.json --publish always",
+     "release-appx": "electron-builder --config electron-builder-appx.json --publish always",
+-    "release-linux": "electron-builder --config electron-builder-linux-mac.json --publish always",
++    "release-linux": "electron-builder --config electron-builder-linux-mac.json",
+     "release-snap": "electron-builder --config electron-builder-snap.json --publish never"
+   },
+   "repository": {

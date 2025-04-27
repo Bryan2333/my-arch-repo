@@ -1,0 +1,12 @@
+diff --git a/src/main/disableUpdate.js b/src/main/disableUpdate.js
+index f4fdd1e..7ad2d61 100644
+--- a/src/main/disableUpdate.js
++++ b/src/main/disableUpdate.js
+@@ -1,4 +1,4 @@
+ export function disableUpdate()
+ {
+-	return false;
+-}
+\ No newline at end of file
++	return true;
++}
