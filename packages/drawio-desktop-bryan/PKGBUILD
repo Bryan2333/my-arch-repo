@@ -3,7 +3,7 @@
 _pkgname=drawio-desktop
 pkgname="${_pkgname}"-bryan
 pkgver=26.2.15
-pkgrel=1
+pkgrel=2
 pkgdesc="Diagram drawing application built on web technology"
 arch=('x86_64')
 url="https://www.drawio.com"
@@ -24,19 +24,17 @@ makedepends=(
 provides=('drawio-desktop')
 conflicts=('drawio-desktop')
 source=(
-    "git+https://github.com/jgraph/drawio-desktop.git#tag=v$pkgver"
-    "git+https://github.com/jgraph/drawio.git#tag=v$pkgver"
-    "01-only-build-for-linux-x64.patch"
+    "drawio-${pkgver}.tar.gz::https://github.com/jgraph/drawio/archive/refs/tags/v${pkgver}.tar.gz"
+    "drawio-desktop-${pkgver}.tar.gz::https://github.com/jgraph/drawio-desktop/archive/refs/tags/v${pkgver}.tar.gz"
+    "01-only-build-pacman-x64.patch"
     "02-disable-auto-updates.patch"
     "launch-drawio"
 )
-sha256sums=(
-    'SKIP'
-    'SKIP'
-    '535fe449d329790cd474a4e2d2caffae34694a9df0812b380c0f4cbe0067a9f7'
-    '248a44b4830b846fb1802d7a71218405d888aca783750954643f5639ed9093b3'
-    '7e7984cf831d7d8d970b2f217782e7b281a1492cacf92a8f3ce2dc73a24cb626'
-)
+sha256sums=('04bce7d05967c14c2bb14797c350ff23d3a42f71e533b6832b4ba51bd3126cc2'
+            '8719e65d16b0db67d05a314c5efeb4c7c1fa7512e3d61d6a6d5bc52de23b03ac'
+            '1a14f53e62f1a2b7ae744e007f86bbb41f615fc4ce8bc21b39c8c6a178c0bd4d'
+            '248a44b4830b846fb1802d7a71218405d888aca783750954643f5639ed9093b3'
+            '7e7984cf831d7d8d970b2f217782e7b281a1492cacf92a8f3ce2dc73a24cb626')
 
 _ensure_local_nvm() {
     # let's be sure we are starting clean
@@ -51,54 +49,48 @@ _ensure_local_nvm() {
 
 
 prepare() {
-    cd "${_pkgname}"
-    git submodule init
-    git config submodule.drawio.url "${srcdir}/drawio"
-    git -c protocol.file.allow=always submodule update
+    rm -rf "${srcdir}/drawio-desktop-${pkgver}/drawio"
 
-    patch -Np1 < "${srcdir}/01-only-build-for-linux-x64.patch"
+    mv "${srcdir}/drawio-${pkgver}" "${srcdir}/drawio-desktop-${pkgver}/drawio"
+
+    cd "${srcdir}/drawio-desktop-${pkgver}/drawio"
+    rm -rf docs etc src/main/java src/main/webapp/connect src/main/webapp/service-worker* src/main/webapp/workbox-*
+
+    cd src/main/webapp/js
+    rm -rf atlas-viewer.min.js atlas.min.js cryptojs deflate dropbox embed* freehand integrate.min.js jquery jszip mermaid onedrive orgchart reader.min.js rough sanitizer shapes.min.js simplepeer spin viewer-static.min.js viewer.min.js
+}
+
+build() {
+    cd "${srcdir}/drawio-desktop-${pkgver}"
+
+    patch -Np1 < "${srcdir}/01-only-build-pacman-x64.patch"
     patch -Np1 < "${srcdir}/02-disable-auto-updates.patch"
 
     _ensure_local_nvm
-
     nvm install lts/jod
     nvm use lts/jod
 
     npm install
-}
-
-build() {
-    cd "${_pkgname}"
-
-    _ensure_local_nvm
-    nvm use lts/jod
-
     npm run release-linux 
 
-    mkdir "${srcdir}/tmp"
-
-    mv "dist/draw.io-amd64-${pkgver}.deb" "${srcdir}/tmp"
+    mkdir -p "${srcdir}/tmp"
+    mv "dist/draw.io-x64-${pkgver}.pacman" "${srcdir}/tmp"
 
     cd "${srcdir}/tmp"
-
-    ar x "draw.io-amd64-${pkgver}.deb"
-
-    [[ -f "data.tar.xz" ]] && bsdtar -xf data.tar.xz
-
-    rm -r "usr/share/doc"
+    bsdtar -xf "draw.io-x64-${pkgver}.pacman"
 
     sed -i \
         -e "s|Exec=.*|Exec=/usr/bin/drawio %U|" \
         -e '/^StartupWMClass/d' \
-        "usr/share/applications/drawio.desktop"
+        usr/share/applications/drawio.desktop
 
-    mv "usr/share/applications/drawio.desktop" "usr/share/applications/draw.io.desktop"
+    mv usr/share/applications/drawio.desktop usr/share/applications/draw.io.desktop
 }
 
 package() {
     cd "${srcdir}/tmp"
-    install -dm755 "${pkgdir}/opt"
 
+    install -dm755 "${pkgdir}/opt"
     cp -r "opt/draw.io" "${pkgdir}/opt/drawio-desktop"
     cp -r "usr" "${pkgdir}/"
 

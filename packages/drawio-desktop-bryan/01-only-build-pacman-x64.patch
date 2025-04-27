@@ -1,8 +1,8 @@
 diff --git a/electron-builder-linux-mac.json b/electron-builder-linux-mac.json
-index a7fedf6..6b161a0 100644
+index a7fedf6..7825d5a 100644
 --- a/electron-builder-linux-mac.json
 +++ b/electron-builder-linux-mac.json
-@@ -44,19 +44,8 @@
+@@ -44,29 +44,12 @@
      "maintainer": "JGraph <support@draw.io>",
      "icon": "./build",
      "target": [
@@ -11,7 +11,7 @@ index a7fedf6..6b161a0 100644
 -          "arm64"
 -        ]
 -      },
-       { "target": "deb", "arch": [
+-      { "target": "deb", "arch": [
 -          "x64",
 -          "arm64"
 -        ]
@@ -19,10 +19,21 @@ index a7fedf6..6b161a0 100644
 -      { "target": "rpm", "arch": [
 -          "x64",
 -          "arm64"
++      { "target": "pacman", "arch": [
 +          "x64"
          ]
        }
      ]
+   },
+-  "rpm": {
+-    "fpm": [
+-      "--rpm-rpmbuild-define=_build_id_links none",
+-      "--rpm-digest=sha256"
+-    ]
+-  },
+   "fileAssociations": [
+ 	  {
+ 	  	"ext": "drawio",
 diff --git a/package.json b/package.json
 index a636a0f..3c1777a 100644
 --- a/package.json
