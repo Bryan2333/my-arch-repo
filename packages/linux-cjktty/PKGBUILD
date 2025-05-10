@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux-cjktty
-pkgver=6.13.8.arch1
+pkgver=6.14.6.arch1
 pkgrel=1
 pkgdesc='Linux (with cjktty-patches)'
 url='https://github.com/archlinux/linux'
@@ -34,32 +34,29 @@ source=(
   config  # the main kernel config file
 )
 source+=("$_cjktty_repo/raw/master/v6.x/cjktty-6.9.patch"
-         "$_cjktty_repo/raw/master/cjktty-add-cjk32x32-font-data.patch"
-         "0001-wifi-iwlwifi-don-t-warn-if-the-NIC-is-gone-in-resume.patch")
+         "$_cjktty_repo/raw/master/cjktty-add-cjk32x32-font-data.patch")
 validpgpkeys=(
   ABAF11C65A2970B130ABE3C479BE3E4300411886  # Linus Torvalds
   647F28654894E3BD457199BE38DBBDC86092693E  # Greg Kroah-Hartman
   83BC8889351B5DEBBB68416EB8AC08600F108CDF  # Jan Alexander Steffens (heftig)
 )
 # https://www.kernel.org/pub/linux/kernel/v6.x/sha256sums.asc
-sha256sums=('259afa59d73d676bec2ae89beacd949e08d54d3f70a7f8b0a742315095751abb'
+sha256sums=('21817f1998e2230f81f7e4f605fa6fdcb040e14fa27d99c27ddb16ce749797a9'
             'SKIP'
-            '8807a915606709dd8ab98fa836fadefda39ed500c48377355be09fe9a2caaf81'
+            'e9bac19174ffcab45c0db7d054bb42b3a6a1f8e7f81ec7610d7b5a9cf5946108'
             'SKIP'
-            '797e4d772a62dd24cb281886ec844f718bb910f2b2bfe2de389d341aeb3e5bb1')
-b2sums=('c20916a44a07d355ba8337229f102cd507deae92c88576040965e909fa89c09f98611746a8c8f249bc3dcf492238ce3f08c48f523670ccad4bd7ec21622806af'
+            '15df67e5d931b0b2b26dafa40f6ecfb64d8e3bf0fb15840bf3fe225c7285ad77')
+b2sums=('dedcadc0b7506f620da3ac849446539e83d694f0955d5417e063b6680d53ef8993eeef40562ae8dae9249a21bea9746093f8873a360dd74f6b139fbafdd7b9ac'
         'SKIP'
-        'ebff29f7282a7dab84ca09c9c23621daec8d38541c773dc068d5c313db7a60c67e204775ad6e00746ee8f04a7705ab398688e03b2e5534e9062d276e8d6c9d30'
+        'ef3cdc4558949c0694f362cc68880c5c067ef3f9633aff4f6c9ed2e5017a75b00aac7e2ad45b33371b341efb6423430d5446ff4024ff0a5542663107d17b219a'
         'SKIP'
-        'a32ded4819b0fe212136a976435b58aa1305ad8ff1e2644d11c996a066241c5479bd144897044f3e71dffcd395f38ed1adf6a105a18d920751bfa052548dea8f')
+        'ddd747ef366fc040e08ed1bcf0d04222b67d4396eb45a3f0dfaa9f4eba1e113061deba1978646147e7345ac2e76af099f6ed19c505b883aeecdae9615358da6a')
 
 sha256sums+=('6714bf3968392e29f19e44514d490ad7ec718c3897003210fd1e499017dd429d'
-             'c648ff21f0a5714743bbae85d6c6e1ed2bf961b6bca976d4c6b4c8d3f6b2739f'
-             '5a3d9dff035b2840be510f772dee4d6a6ebacb738a39c87a7d282a506e0d1a31')
+             'c648ff21f0a5714743bbae85d6c6e1ed2bf961b6bca976d4c6b4c8d3f6b2739f')
 
 b2sums+=('8e08152d7413fbd00f71e5f09c680ad7b6b4f8bdfbd56b07659ea7ce54a7d738b73c0fa240f3c90133d4cb2e566be94ffaad5ba1ffddbd4dff99ea6587c44b42'
-         '101996793aeede5e456b23b35c2fd4af5c38fd363473dcdda0bce6e21d110a9f88a67e325b1ebf8efef4a7511f135c4f64ff1fc54b8ef925a5df8d6292ba7678'
-         '01851a9c9f79261e94507790b186639e772b4251512edf12f89047a1b121ca81e0681c42b365591ddca8767f992b45f6e53b769eb0e53589cd0a026ff1aaecc3')
+         '101996793aeede5e456b23b35c2fd4af5c38fd363473dcdda0bce6e21d110a9f88a67e325b1ebf8efef4a7511f135c4f64ff1fc54b8ef925a5df8d6292ba7678')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
@@ -116,6 +113,7 @@ _package() {
   )
   provides=(
     KSMBD-MODULE
+    NTSYNC-MODULE
     VIRTUALBOX-GUEST-MODULES
     WIREGUARD-MODULE
   )
