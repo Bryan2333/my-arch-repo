@@ -2,8 +2,8 @@
 
 _pkgname=drawio-desktop
 pkgname="${_pkgname}"-bryan
-pkgver=26.2.15
-pkgrel=2
+pkgver=27.0.2
+pkgrel=1
 pkgdesc="Diagram drawing application built on web technology"
 arch=('x86_64')
 url="https://www.drawio.com"
@@ -30,9 +30,9 @@ source=(
     "02-disable-auto-updates.patch"
     "launch-drawio"
 )
-sha256sums=('04bce7d05967c14c2bb14797c350ff23d3a42f71e533b6832b4ba51bd3126cc2'
-            '8719e65d16b0db67d05a314c5efeb4c7c1fa7512e3d61d6a6d5bc52de23b03ac'
-            '1a14f53e62f1a2b7ae744e007f86bbb41f615fc4ce8bc21b39c8c6a178c0bd4d'
+sha256sums=('943bf672292663e669f48767fbb52865c28e227fac0f1b8e8eb22991016c60fd'
+            '9b5981906af6e6037b0ac96637072b374f7cf809e0e83ee5079282d5bd36b25d'
+            'adb569c571625b7b4fe6d22cbda8ce60ac7b6d73f09ef0a1e2f916704866bde7'
             '248a44b4830b846fb1802d7a71218405d888aca783750954643f5639ed9093b3'
             '7e7984cf831d7d8d970b2f217782e7b281a1492cacf92a8f3ce2dc73a24cb626')
 
